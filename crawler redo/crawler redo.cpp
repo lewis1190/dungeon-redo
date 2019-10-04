@@ -9,7 +9,7 @@ void genMap(char* outNum);
 
 int main()
 {
-	char myArray[31 * 10]; // +11 To take into account the Null terminator, plus 10 lots of \n when getting the characters
+	char myArray[31 * 10];
 	genMap(myArray);
 
 	for (int y = 0; y < 10; y++)
