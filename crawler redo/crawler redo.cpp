@@ -7,6 +7,7 @@
 #include <string>
 #include <cctype> // For making lowercase
 #include <array>
+#include <vector>
 
 struct Player
 {
@@ -17,28 +18,30 @@ struct Player
 
 void genMap(char* mapArray);
 void findPlayer(char* mapArray, Player &thePlayer);
-void redrawMap(char* mapArray, int playerPos);
+void redrawMap(char* mapArray, int playerPos, std::vector<std::string> &sysLog);
 void movePlayer(char* mapArray, Player &thePlayer, char ch);
-void tileCheck(Player &thePlayer);
+void tileCheck(Player &thePlayer, std::vector <std::string> &sysLog, bool &gameEnded);
+void addLogMessage(std::vector<std::string> &sysLog, std::string message);
 
 int main()
 {
 	bool gameEnded = false;
-
 	char myArray[31 * 10];
 	genMap(myArray);
 	//redrawMap(myArray);
 
+	std::vector <std::string> sysLog;
+
 	Player thePlayer = {};
 	findPlayer(myArray, thePlayer);
-	redrawMap(myArray, thePlayer.position);
+	redrawMap(myArray, thePlayer.position, sysLog);
 
 	while (!gameEnded)
 	{
 		char ch = _getch();
 		movePlayer(myArray, thePlayer, ch);
-		tileCheck(thePlayer);
-		redrawMap(myArray, thePlayer.position);
+		tileCheck(thePlayer, sysLog, gameEnded);
+		redrawMap(myArray, thePlayer.position, sysLog);
 	}
 }
 
@@ -82,7 +85,7 @@ void findPlayer(char* mapArray, Player &thePlayer)
 	}
 }
 
-void redrawMap(char* mapArray, int playerPos)
+void redrawMap(char* mapArray, int playerPos, std::vector<std::string> &sysLog)
 {
 	//std::cout << "\033[2J\033[0; 0H";
 	system("cls");
@@ -95,6 +98,16 @@ void redrawMap(char* mapArray, int playerPos)
 		}
 		std::cout << std::endl;
 	}
+
+	std::cout << std::endl;
+	std::cout << "===============================" << std::endl;
+	std::cout << "              LOG              " << std::endl;
+	std::cout << "===============================" << std::endl;
+	for (size_t i = 0; i < sysLog.size(); ++i)
+	{
+		std::cout << sysLog[i] << std::endl;
+	}
+	
 }
 
 void movePlayer(char* mapArray, Player &thePlayer, char theChar)
@@ -149,13 +162,23 @@ void movePlayer(char* mapArray, Player &thePlayer, char theChar)
 	}
 }
 
-void tileCheck(Player& thePlayer)
+void tileCheck(Player& thePlayer, std::vector<std::string>& sysLog, bool &gameEnded)
 {
 	switch (thePlayer.standingOn)
 	{
 	case 'G':
 		thePlayer.standingOn = '.';
 		thePlayer.goldCount++;
+		addLogMessage(sysLog, "Picked up gold!");
+		break;
+	case 'E':
+		addLogMessage(sysLog, "You've escaped! Congratulations!");
+		gameEnded = true;
 		break;
 	}
+}
+
+void addLogMessage(std::vector<std::string> &sysLog, std::string message)
+{
+	sysLog.push_back(message);
 }
