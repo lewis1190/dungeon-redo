@@ -1,44 +1,48 @@
 #include "pch.h"
-#include <iostream>
-#include <fstream>
-#include <sstream>
+#include <conio.h> // Used for detecting user input
+#include <iostream> // Input Output streams
+#include <fstream> // String streams
+#include <sstream> // Reading in files
 #include <iomanip>
 #include <string>
+#include <cctype> // For making lowercase
+#include <array>
 
-void genMap(char* outNum);
+struct Player
+{
+	int position;
+	char standingOn;
+	int goldCount;
+};
+
+void genMap(char* mapArray);
+void findPlayer(char* mapArray, Player &thePlayer);
+void redrawMap(char* mapArray, int playerPos);
+void movePlayer(char* mapArray, Player &thePlayer, char ch);
 
 int main()
 {
+	bool gameEnded = false;
+
 	char myArray[31 * 10];
 	genMap(myArray);
+	//redrawMap(myArray);
 
-	for (int y = 0; y < 10; y++)
+	Player thePlayer = {};
+	findPlayer(myArray, thePlayer);
+	redrawMap(myArray, thePlayer.position);
+
+	while (!gameEnded)
 	{
-		for (int x = 0; x < 31; x++)
-		{
-			std::cout << myArray[x + y * 31];
-		}
-		std::cout << std::endl;
+		char ch = _getch();
+		movePlayer(myArray, thePlayer, ch);
+		redrawMap(myArray, thePlayer.position);
 	}
-
-	std::cout << "Both grids should look the same";
 }
 
 void genMap(char* outNum)
 {
 	char array[31 * 10];
-	//for (int y = 0; y < 10; y++)
-	//{
-	//	for (int x = 0; x < 31; x++)
-	//	{
-	//		array[x + y * 31] = 'x';
-	//		std::cout << array[x + y * 31];
-	//		outNum[x + y * 31] = array[x + y * 31];
-	//	}
-
-	//	std::cout << std::endl;
-	//}
-	//std::cout << "--------------------------------------" << std::endl;
 	
 	char theChar;
 	std::ifstream inFile;
@@ -52,21 +56,89 @@ void genMap(char* outNum)
 	else
 	{
 		int charNo = 0;
-		//while (inFile.get(theChar), !inFile.eof())
 		while (inFile >> theChar, !inFile.eof())
 		{
-			std::cout << theChar;
 			array[charNo] = theChar;
-			outNum[charNo] = array[charNo];
+			outNum[charNo] = array[charNo]; // copy to array
 			charNo++;
+		}
 
-			if (!(charNo % 31)) {
-				std::cout << std::endl;
-			}
+		inFile.close();
+	}
+}
+
+void findPlayer(char* mapArray, Player &thePlayer) 
+{
+	for (int i = 0; i < (31*10); i++)
+	{
+		if (mapArray[i] == 'S')
+		{
+			std::cout << "Found player at index: " << i << std::endl;
+			thePlayer.position = i;
+			thePlayer.standingOn = '.';
+			//mapArray[i] = 'P';
+		}
+	}
+}
+
+void redrawMap(char* mapArray, int playerPos)
+{
+	//std::cout << "\033[2J\033[0; 0H";
+	system("cls");
+	mapArray[playerPos] = 'P';
+	for (int y = 0; y < 10; y++)
+	{
+		for (int x = 0; x < 31; x++)
+		{
+			std::cout << mapArray[x + y * 31];
 		}
 		std::cout << std::endl;
-		std::cout << "--------------------------------------" << std::endl;
-		std::cout << std::endl;
-		inFile.close();
+	}
+}
+
+void movePlayer(char* mapArray, Player &thePlayer, char theChar)
+{
+	switch (theChar)
+	{
+	case 'w':
+		if (mapArray[thePlayer.position - 31] == '#') {
+
+		}
+		else
+		{
+			mapArray[thePlayer.position] = '.';
+			thePlayer.position = thePlayer.position - 31;
+		}
+		break;
+	case 'a':
+		if (mapArray[thePlayer.position - 1] == '#') {
+
+		}
+		else
+		{
+			mapArray[thePlayer.position] = '.';
+			thePlayer.position = thePlayer.position - 1;
+		}
+		break;
+	case 's':
+		if (mapArray[thePlayer.position + 31] == '#') {
+
+		}
+		else
+		{
+			mapArray[thePlayer.position] = '.';
+			thePlayer.position = thePlayer.position + 31;
+		}
+		break;
+	case 'd':
+		if (mapArray[thePlayer.position + 1] == '#') {
+
+		}
+		else
+		{
+			mapArray[thePlayer.position] = '.';
+			thePlayer.position = thePlayer.position + 1;
+		}
+		break;
 	}
 }
