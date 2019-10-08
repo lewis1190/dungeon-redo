@@ -19,6 +19,7 @@ void genMap(char* mapArray);
 void findPlayer(char* mapArray, Player &thePlayer);
 void redrawMap(char* mapArray, int playerPos);
 void movePlayer(char* mapArray, Player &thePlayer, char ch);
+void tileCheck(Player &thePlayer);
 
 int main()
 {
@@ -36,6 +37,7 @@ int main()
 	{
 		char ch = _getch();
 		movePlayer(myArray, thePlayer, ch);
+		tileCheck(thePlayer);
 		redrawMap(myArray, thePlayer.position);
 	}
 }
@@ -76,7 +78,6 @@ void findPlayer(char* mapArray, Player &thePlayer)
 			std::cout << "Found player at index: " << i << std::endl;
 			thePlayer.position = i;
 			thePlayer.standingOn = '.';
-			//mapArray[i] = 'P';
 		}
 	}
 }
@@ -98,6 +99,7 @@ void redrawMap(char* mapArray, int playerPos)
 
 void movePlayer(char* mapArray, Player &thePlayer, char theChar)
 {
+	theChar = tolower(theChar);
 	switch (theChar)
 	{
 	case 'w':
@@ -106,8 +108,9 @@ void movePlayer(char* mapArray, Player &thePlayer, char theChar)
 		}
 		else
 		{
-			mapArray[thePlayer.position] = '.';
+			mapArray[thePlayer.position] = thePlayer.standingOn;
 			thePlayer.position = thePlayer.position - 31;
+			thePlayer.standingOn = mapArray[thePlayer.position];
 		}
 		break;
 	case 'a':
@@ -116,8 +119,9 @@ void movePlayer(char* mapArray, Player &thePlayer, char theChar)
 		}
 		else
 		{
-			mapArray[thePlayer.position] = '.';
+			mapArray[thePlayer.position] = thePlayer.standingOn;
 			thePlayer.position = thePlayer.position - 1;
+			thePlayer.standingOn = mapArray[thePlayer.position];
 		}
 		break;
 	case 's':
@@ -126,8 +130,9 @@ void movePlayer(char* mapArray, Player &thePlayer, char theChar)
 		}
 		else
 		{
-			mapArray[thePlayer.position] = '.';
+			mapArray[thePlayer.position] = thePlayer.standingOn;
 			thePlayer.position = thePlayer.position + 31;
+			thePlayer.standingOn = mapArray[thePlayer.position];
 		}
 		break;
 	case 'd':
@@ -136,9 +141,21 @@ void movePlayer(char* mapArray, Player &thePlayer, char theChar)
 		}
 		else
 		{
-			mapArray[thePlayer.position] = '.';
+			mapArray[thePlayer.position] = thePlayer.standingOn;
 			thePlayer.position = thePlayer.position + 1;
+			thePlayer.standingOn = mapArray[thePlayer.position];
 		}
+		break;
+	}
+}
+
+void tileCheck(Player& thePlayer)
+{
+	switch (thePlayer.standingOn)
+	{
+	case 'G':
+		thePlayer.standingOn = '.';
+		thePlayer.goldCount++;
 		break;
 	}
 }
